@@ -50,13 +50,29 @@ def compute_followers(input='dataset/raw/users.bson',
 
 
 @task
-def compute_languages(input='dataset/raw/repos.bson',
-                      output='dataset/languages.txt'):
+def compute_hireable(input='dataset/raw/users.bson',
+                     output='dataset/hireable.txt'):
+    get_fields_bson("login hireable", input, output)
+
+
+@task
+def precompute_languages(input='dataset/raw/repos.bson',
+                         output='dataset/languages.txt'):
     get_fields_bson("owner/login language size", input, output)
+
+
+@task
+def compute_languages(input='dataset/raw/repos.bson',
+                      output='dataset/languages'):
+    precompute_languages(input, output + '.txt')
+    run_cmd('python parsing/languages.py \
+    dataset/languages.txt dataset/languages')
+
 
 @task('compute_login_id', 'compute_followers', 'compute_languages')
 def compute_all():
     pass
+
 
 def run_cmd(cmd):
     "Run a system command verbosely."
