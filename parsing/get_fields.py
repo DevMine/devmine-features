@@ -20,6 +20,8 @@ def read_file(source):
         try:
             record = json.loads(fixed_line)
             print(",".join([read_field(record, f) for f in sys.argv[1:]]))
+        except KeyError:
+            pass
         except Exception as e:
             print("Problem reading line:", line.strip(), file=sys.stderr)
             print(e, file=sys.stderr)
