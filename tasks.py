@@ -38,8 +38,33 @@ def clean_env():
     run_cmd('rm -r ./env && mkdir env && touch env/.keep')
 
 
+@task
+def compute_login_id(input='dataset/raw/users.bson', output='dataset/id.txt'):
+    get_fields_bson("login id", input, output)
+
+
+@task
+def compute_followers(input='dataset/raw/users.bson',
+                      output='dataset/followers.txt'):
+    get_fields_bson("login followers", input, output)
+
+
+@task
+def compute_languages(input='dataset/raw/repos.bson',
+                      output='dataset/languages.txt'):
+    get_fields_bson("owner/login language size", input, output)
+
+@task('compute_login_id', 'compute_followers', 'compute_languages')
+def compute_all():
+    pass
+
 def run_cmd(cmd):
     "Run a system command verbosely."
     print('Running \'' + cmd + '\'...')
     run(cmd)
     print('Done')
+
+
+def get_fields_bson(fields, input, output):
+    run_cmd('bsondump %s | python parsing/get_fields.py %s > %s' %
+            (input, fields, output))

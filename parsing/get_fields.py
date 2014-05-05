@@ -21,8 +21,8 @@ def read_file(source):
             record = json.loads(fixed_line)
             print(",".join([read_field(record, f) for f in sys.argv[1:]]))
         except Exception as e:
-            print >> sys.stderr, "Problem reading line:", line.strip()
-            print >> sys.stderr, e
+            print("Problem reading line:", line.strip(), file=sys.stderr)
+            print(e, file=sys.stderr)
 
 
 if __name__ == "__main__":
