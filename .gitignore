@@ -5,10 +5,20 @@ __pycache__/
 # C extensions
 *.so
 
+# data files
+*.json
+*.bson
+*.sql
+
 # Distribution / packaging
 .Python
 env/*
 !env/.keep
+dataset/*
+!dataset/.keep
+!dataset/raw
+dataset/raw/*
+!dataset/raw/.keep
 bin/
 build/
 develop-eggs/
