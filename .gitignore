@@ -17,6 +17,9 @@ env/*
 dataset/*
 !dataset/.keep
 !dataset/raw
+dataset/languages/*
+!dataset/languages
+!dataset/languages/.keep
 dataset/raw/*
 !dataset/raw/.keep
 bin/
