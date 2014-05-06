@@ -3,7 +3,7 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.graphx._
 
 
-object SimpleApp {
+object Pagerank {
   def main(args: Array[String]) {
     val sc = new SparkContext(args(0), "PageRank", System.getenv("SPARK_HOME"),
       SparkContext.jarOfClass(this.getClass).toSeq)
