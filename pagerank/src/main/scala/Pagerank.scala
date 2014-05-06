@@ -5,7 +5,7 @@ import org.apache.spark.graphx._
 
 object SimpleApp {
   def main(args: Array[String]) {
-    val sc = new SparkContext(args(0), "PageRank", Spark.getenv("SPARK_HOME"),
+    val sc = new SparkContext(args(0), "PageRank", System.getenv("SPARK_HOME"),
       SparkContext.jarOfClass(this.getClass).toSeq)
 
     // Load the edges as a graph
