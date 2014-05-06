@@ -5,15 +5,15 @@ import org.apache.spark.graphx._
 
 object SimpleApp {
   def main(args: Array[String]) {
-    val sc = new SparkContext("local", "Simple App", ".",
-      List("target/scala-2.10/pagerank_2.10-1.0.jar"))
+    val sc = new SparkContext(args(0), "PageRank", Spark.getenv("SPARK_HOME"),
+      SparkContext.jarOfClass(this.getClass).toSeq)
 
     // Load the edges as a graph
-    val graph = GraphLoader.edgeListFile(sc, args(0))
+    val graph = GraphLoader.edgeListFile(sc, args(1))
     // Run PageRank
     val ranks = graph.pageRank(0.0001).vertices
     // Join the ranks with the usernames
-    val users = sc.textFile(args(1)).map { line =>
+    val users = sc.textFile(args(2)).map { line =>
       val fields = line.split(",")
                                                           (fields(0).toLong, fields(1))
                                                         }
