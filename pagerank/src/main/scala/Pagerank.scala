@@ -11,7 +11,8 @@ object Pagerank {
 
     val conf = new SparkConf()
                          .set("spark.driver.host", args(1))
-    conf.setJars(SparkContext.jarOfClass(this.getClass).toSeq)
+                         .setJars(SparkContext.jarOfClass(this.getClass).toSeq)
+                         .setSparkHome(System.getenv("SPARK_HOME"))
     val sc = new SparkContext(args(0), "PageRank", conf)
 
     // Load the edges as a graph
