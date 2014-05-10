@@ -28,28 +28,44 @@ GenerateUserInserts () {
     awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before $1, q $2 q after }' $FILENAME
 }
 
-# Check if Postgres wrapper scripts are available
-if hash psql 2>/dev/null; then
-    EXISTS=$(psql -l | grep $DB | wc -l)
-    if [ "$EXISTS" -gt "0" ]; then
-        while getopts "yu:f:" opt; do
-            case $opt in
-                u) GenerateUserInserts $OPTARG | psql -q $DB
-                    ;;
-                f) 
-                    BASE_FILE_EXT=$(basename "$OPTARG")
-                    BASE_FILE="${BASE_FILE_EXT%.*}"
-                    GenerateFeatureInserts $OPTARG $BASE_FILE | psql -q $DB
-                    ;;
-                \?) echo "Invalid option: -$OPTARG" >&2
-                    ;;
-            esac
-        done
-        exit 0
-    else
-        echo "Postgresql DB $DB does not exist"
+CheckDbExists () {
+    local EXISTS=$(psql -l | grep $DB | wc -l)
+    if [ "$EXISTS" -lt "1" ]; then
+        echo "ERROR: Postgresql DB $DB does not exist"
         exit 1
     fi
+}
+
+# Check if Postgres wrapper scripts are available
+if hash psql 2>/dev/null; then
+    while getopts "u:f:h" opt; do
+        case $opt in
+            u) 
+                CheckDbExists
+                GenerateUserInserts $OPTARG | psql -q $DB
+                ;;
+            f) 
+                CheckDbExists
+                BASE_FILE_EXT=$(basename "$OPTARG")
+                BASE_FILE="${BASE_FILE_EXT%.*}"
+                GenerateFeatureInserts $OPTARG $BASE_FILE | psql -q $DB
+                ;;
+            h)
+                echo "Usage: $0 [-u file]* [-f file]*"
+                echo "In order to use this command, make sure you have a"
+                echo "Postgres database named $DB running."
+                echo "Options: -u file: Add all users in file to db."
+                echo "                  File format: userid,login"
+                echo "         -f file: Add all scores in file to db."
+                echo "                  The filename without extension will be the name of the feature."
+                echo "                  File format: uname,score"
+                echo "         -h     : Displays this help."
+                ;;
+            \?) echo "Invalid option: -$OPTARG" >&2
+                ;;
+        esac
+    done
+    exit 0
 else
     echo "psql could not be found"
     exit 1
