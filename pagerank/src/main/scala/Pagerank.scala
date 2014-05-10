@@ -28,6 +28,6 @@ object Pagerank {
       case (id, (username, rank)) => (username, rank)
     }
     // Print the result
-    println(ranksByUsername.collect().mkString("\n"))
+    ranksByUsername.saveAsTextFile(args(4))
   }
 }
