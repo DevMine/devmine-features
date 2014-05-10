@@ -19,6 +19,7 @@ def read_file(source):
         fixed_line = fix_line(line)
         try:
             record = json.loads(fixed_line)
+            #print sys.argv
             print(",".join([read_field(record, f) for f in sys.argv[1:]]))
         except KeyError:
             pass
