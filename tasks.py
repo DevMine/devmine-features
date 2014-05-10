@@ -117,6 +117,26 @@ def compute_issues_detected(input='dataset/raw/issues.bson',
                          output='dataset/issues_detected'):
     precompute_issues_detected(input, output + '.txt')
     run_cmd('python parsing/issues_detected.py %s.txt %s' %(output, output))
+
+@task
+def precompute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
+                         output='dataset/projects_contributed.txt'):
+    get_fields_bson("login", input, output)
+
+@task
+def compute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
+                         output='dataset/projects_contributed'):
+    precompute_projects_contributed(input, output + '.txt')
+    run_cmd('python parsing/collaborators.py %s.txt %s' %(output, output)) 
+    
+@task
+def compute_projects_language(input='dataset/raw/repos.bson',
+                         output='dataset/projects_language'):
+    # TODO:
+    # we need to join the repo_collaborators and repos
+    # in repo_collaborators, we don't have repo id
+    # but we can use owner_id/repo_name as the id
+    pass
     
 @task
 def precompute_issues_solved(input='dataset/raw/issues.bson',
