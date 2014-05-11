@@ -10,8 +10,8 @@ GenerateFeatureInserts () {
     local FILENAME=$1
     local FEATURENAME=$2
 
-    #TODO delete all old entries for feature from db
     echo "DELETE FROM $FEATURES_TABLE WHERE NAME = '$FEATURENAME';"
+    echo "DELETE FROM $SCORES_TABLE WHERE FNAME = '$FEATURENAME';"
 
     echo "INSERT INTO $FEATURES_TABLE (NAME) VALUES ('$FEATURENAME');"
 
