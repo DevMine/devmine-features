@@ -10,7 +10,6 @@ GenerateFeatureInserts () {
     local FILENAME=$1
     local FEATURENAME=$2
 
-    echo "SET AUTOCOMMIT TO OFF;"
     echo "BEGIN;"
 
     echo "DELETE FROM $FEATURES_TABLE WHERE NAME = '$FEATURENAME';"
@@ -18,41 +17,24 @@ GenerateFeatureInserts () {
 
     echo "INSERT INTO $FEATURES_TABLE (NAME) VALUES ('$FEATURENAME');"
 
-    for ((i = 0 ; i < $(wc - l $FILENAME) ; i++)); do
-        if ! (($i % 1000)); then
-            echo "COMMIT;"
-            echo "BEGIN;"
-        fi
-
-        local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
-        local AFTER=");"
-        awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
-    done
+    local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
+    local AFTER=");"
+    awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
 
     echo "COMMIT;"
-    echo "SET AUTOCOMMIT TO ON;"
 }
 
 GenerateUserInserts () {
     local FILENAME=$1
 
-    echo "SET AUTOCOMMIT TO OFF;"
     echo "BEGIN;"
 
-    for ((i = 0 ; i < $(wc - l $FILENAME) ; i++)); do
-        if ! (($i % 1000)); then
-            echo "COMMIT;"
-            echo "BEGIN;"
-        fi
+    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
+    local AFTER=");"
 
-        local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
-        local AFTER=");"
-
-        awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
-    done
+    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
 
     echo "COMMIT;"
-    echo "SET AUTOCOMMIT TO ON;"
 }
 
 CheckDbExists () {
