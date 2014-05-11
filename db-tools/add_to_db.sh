@@ -10,6 +10,9 @@ GenerateFeatureInserts () {
     local FILENAME=$1
     local FEATURENAME=$2
 
+    echo "SET AUTOCOMMIT TO OFF;"
+    echo "BEGIN;"
+
     echo "DELETE FROM $FEATURES_TABLE WHERE NAME = '$FEATURENAME';"
     echo "DELETE FROM $SCORES_TABLE WHERE FNAME = '$FEATURENAME';"
 
@@ -18,16 +21,19 @@ GenerateFeatureInserts () {
     local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
     local AFTER=");"
     awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
+
+    echo "COMMIT;"
+    echo "SET AUTOCOMMIT TO ON;"
 }
 
 GenerateUserInserts () {
     local FILENAME=$1
 
-    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
-    local AFTER=");"
-
     echo "SET AUTOCOMMIT TO OFF;"
     echo "BEGIN;"
+
+    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
+    local AFTER=");"
 
     awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
 
