@@ -272,7 +272,7 @@ table_file = {}
 for table in table_regexp.keys():
     table_file[table] = open("../dataset/out/" + table, "w")
 
-with open("../../mysql-2014-04-02.sql") as f:
+with open("../dataset/mysql-2014-04-02.sql") as f:
     i = 0
     for l in f:
         try:
