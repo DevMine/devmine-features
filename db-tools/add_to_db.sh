@@ -36,7 +36,7 @@ GenerateUserInserts () {
 }
 
 CheckDbExists () {
-    local EXISTS=$(psql -l | grep $DB | wc -l)
+    local EXISTS=$(psql -U $DB_USER-l | grep $DB | wc -l)
     if [ "$EXISTS" -lt "1" ]; then
         echo "ERROR: Postgresql DB $DB does not exist"
         exit 1
@@ -49,13 +49,13 @@ if hash psql 2>/dev/null; then
         case $opt in
             u) 
                 CheckDbExists
-                GenerateUserInserts $OPTARG | psql -q $DB
+                GenerateUserInserts $OPTARG | psql -U $DB_USER -q $DB
                 ;;
             f) 
                 CheckDbExists
                 BASE_FILE_EXT=$(basename "$OPTARG")
                 BASE_FILE="${BASE_FILE_EXT%.*}"
-                GenerateFeatureInserts $OPTARG $BASE_FILE | psql -q $DB
+                GenerateFeatureInserts $OPTARG $BASE_FILE | psql -U $DB_USER -q $DB
                 ;;
             h)
                 echo "Usage: $0 [-u file]* [-f file]*"
