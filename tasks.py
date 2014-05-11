@@ -61,7 +61,7 @@ def compute_location(input='dataset/raw/users.bson', output='dataset/location.tx
     for pair in pairs:
         s = "%s,%s\n" % (pair[0],pair[1])
         f.write(s)
-        f.flush()    
+        f.flush()
     f.close()
 
 @task
@@ -83,7 +83,7 @@ def compute_company(input='dataset/raw/users.bson', output='dataset/company.txt'
     for pair in pairs:
         s = "%s,%s\n" % (pair[0],pair[1])
         f.write(s)
-        f.flush()    
+        f.flush()
     f.close()
 
 @task
@@ -127,8 +127,8 @@ def precompute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
 def compute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
                          output='dataset/projects_contributed'):
     precompute_projects_contributed(input, output + '.txt')
-    run_cmd('python parsing/collaborators.py %s.txt %s' %(output, output)) 
-    
+    run_cmd('python parsing/collaborators.py %s.txt %s' %(output, output))
+
 @task
 def compute_projects_language(input='dataset/raw/repos.bson',
                          output='dataset/projects_language'):
@@ -137,7 +137,7 @@ def compute_projects_language(input='dataset/raw/repos.bson',
     # in repo_collaborators, we don't have repo id
     # but we can use owner_id/repo_name as the id
     pass
-    
+
 @task
 def precompute_issues_solved(input='dataset/raw/issues.bson',
                          output='dataset/issues_solved.txt'):
