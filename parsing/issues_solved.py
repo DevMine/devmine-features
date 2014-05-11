@@ -19,7 +19,7 @@ def read_issues(source, outdir):
     # Write
     f = open(outdir + ".txt", "w")
     for user in users_count.keys():
-        s = '%s,%d\n' % (str(user),users_count[user])
+        s = '%s,%d\n' % (str(user), users_count[user])
         f.write(s)
 
     f.flush()
