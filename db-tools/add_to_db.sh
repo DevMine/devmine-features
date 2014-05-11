@@ -18,9 +18,16 @@ GenerateFeatureInserts () {
 
     echo "INSERT INTO $FEATURES_TABLE (NAME) VALUES ('$FEATURENAME');"
 
-    local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
-    local AFTER=");"
-    awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
+    for ((i = 0 ; i < $(wc - l $FILENAME) ; i++)); do
+        if ! (($i % 1000)); then
+            echo "COMMIT;"
+            echo "BEGIN;"
+        fi
+
+        local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
+        local AFTER=");"
+        awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
+    done
 
     echo "COMMIT;"
     echo "SET AUTOCOMMIT TO ON;"
@@ -32,10 +39,17 @@ GenerateUserInserts () {
     echo "SET AUTOCOMMIT TO OFF;"
     echo "BEGIN;"
 
-    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
-    local AFTER=");"
+    for ((i = 0 ; i < $(wc - l $FILENAME) ; i++)); do
+        if ! (($i % 1000)); then
+            echo "COMMIT;"
+            echo "BEGIN;"
+        fi
 
-    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
+        local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
+        local AFTER=");"
+
+        awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
+    done
 
     echo "COMMIT;"
     echo "SET AUTOCOMMIT TO ON;"
