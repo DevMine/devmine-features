@@ -25,7 +25,14 @@ GenerateUserInserts () {
 
     local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
     local AFTER=");"
+
+    echo "SET AUTOCOMMIT TO OFF;"
+    echo "BEGIN;"
+
     awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
+
+    echo "COMMIT;"
+    echo "SET AUTOCOMMIT TO ON;"
 }
 
 CheckDbExists () {
