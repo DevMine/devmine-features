@@ -23,9 +23,9 @@ GenerateFeatureInserts () {
 GenerateUserInserts () {
     local FILENAME=$1
 
-    local BEFORE="INSERT INTO $USERS_TABLE (UID, LOGIN) VALUES ("
+    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
     local AFTER=");"
-    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before $1, q $2 q after }' $FILENAME
+    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
 }
 
 CheckDbExists () {
@@ -55,7 +55,7 @@ if hash psql 2>/dev/null; then
                 echo "In order to use this command, make sure you have a"
                 echo "Postgres database named $DB running."
                 echo "Options: -u file: Add all users in file to db."
-                echo "                  File format: userid,login"
+                echo "                  File format: login"
                 echo "         -f file: Add all scores in file to db."
                 echo "                  The filename without extension will be the name of the feature."
                 echo "                  File format: uname,score"
