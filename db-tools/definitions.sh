@@ -2,8 +2,8 @@
 set -o nounset
 set -o errexit
 
-DB="devmine"
-DB_USER="devmine"
+DB=${DB-devmine}
+DB_USER=${DB_USER-devmine}
 SCORES_TABLE="SCORES"
 USERS_TABLE="USERS"
 FEATURES_TABLE="FEATURES"
