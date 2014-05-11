@@ -56,7 +56,7 @@ GenerateUserInserts () {
 }
 
 CheckDbExists () {
-    local EXISTS=$(psql -U $DB_USER | grep $DB | wc -l)
+    local EXISTS=$(psql -ls -U $DB_USER | grep $DB | wc -l)
     if [ "$EXISTS" -lt "1" ]; then
         echo "ERROR: Postgresql DB $DB does not exist"
         exit 1
