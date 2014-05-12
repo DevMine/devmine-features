@@ -14,14 +14,6 @@ __pycache__/
 .Python
 env/*
 !env/.keep
-dataset/*
-!dataset/.keep
-!dataset/raw
-dataset/languages/*
-!dataset/languages
-!dataset/languages/.keep
-dataset/raw/*
-!dataset/raw/.keep
 bin/
 build/
 develop-eggs/
@@ -69,3 +61,21 @@ docs/_build/
 
 *~
 .directory
+
+# Dataset directories
+dataset/*
+!dataset/.keep
+dataset/intermediate/*
+!dataset/intermediate/.keep
+!dataset/intermediate
+dataset/scores/*
+!dataset/scores/.keep
+!dataset/scores
+dataset/tables/*
+!dataset/tables/.keep
+!dataset/tables
+!dataset/raw
+!dataset/raw/.keep
+dataset/raw/*
+
+
