@@ -1,4 +1,3 @@
-#!/usr/bin/python2.7
 import re
 
 
@@ -13,6 +12,7 @@ def string_group(name):
 
 def construct_regex(groups):
     return re.compile("\(" + ",".join(groups) + "\)")
+
 
 regex_commits = construct_regex([number_group("id"),
                                  string_group("sha"),
@@ -167,122 +167,3 @@ table_regexp = {
     "users": regex_users,
     "watchers": regex_watchers
 }
-
-table_fields = {"commits":
-                [
-                    "author_id",
-                    "committer_id",
-                    "project_id",
-                    "created_at"
-                ],
-                "counters":
-                [
-                    "id",
-                    "date",
-                    "commit_comments",
-                    "commit_parents",
-                    "commits",
-                    "followers",
-                    "organization_members",
-                    "projects",
-                    "users",
-                    "issues",
-                    "pull_requests",
-                    "issue_comments",
-                    "pull_request_comments",
-                    "pull_request_history",
-                    "watchers",
-                    "forks"
-                ],
-                "followers":
-                [
-                    "follower_id",
-                    "user_id"
-                ],
-                "forks":
-                [
-                    "forked_project_id",
-                    "forked_from_id",
-                    "created_at"
-                ],
-                "issues":
-                [
-                    "repo_id",
-                    "reporter_id",
-                    "assignee_id",
-                    "created_at"
-                ],
-                "organization_members":
-                [
-                    "org_id",
-                    "user_id",
-                    "created_at"
-                ],
-                "project_commits":
-                [
-                    "project_id",
-                    "commit_id"
-                ],
-                "project_members":
-                [
-                    "repo_id",
-                    "user_id",
-                    "created_at"
-                ],
-                "projects":
-                [
-                    "id",
-                    "owned_id",
-                    "name",
-                    "language",
-                    "created_at",
-                    "forked_from",
-                    "deleted"
-                ],
-                "pull_requests":
-                [
-                    "id",
-                    "head_repo_id",
-                    "base_repo_id",
-                    "head_commit_id",
-                    "base_commid_id",
-                    "user_id",
-                    "merged"
-                ],
-                "users":
-                [
-                    "id",
-                    "login",
-                    "name",
-                    "company",
-                    "location",
-                    "email",
-                    "created_at",
-                    "type"
-                ],
-                "watchers":
-                [
-                    "repo_id",
-                    "user_id",
-                    "created_at"
-                ]}
-
-table_file = {}
-
-for table in table_regexp.keys():
-    table_file[table] = open("../dataset/out/" + table, "w")
-
-with open("../dataseto/mysql-2014-04-02.sql") as f:
-    i = 0
-    for l in f:
-        try:
-            i += 1
-            if l.startswith("INSERT INTO"):
-                table = l.split()[2][1:-1]
-                if table in table_regexp:
-                    for match in re.finditer(table_regexp[table], l):
-                        fields = [match.group(f) for f in table_fields[table]]
-                        out = ",".join(fields)
-                        print >> table_file[table], out
-        except Exception as e:
-            print "error at line ", i, e
