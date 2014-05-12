@@ -10,26 +10,35 @@ GenerateFeatureInserts () {
     local FILENAME=$1
     local FEATURENAME=$2
 
-    #TODO delete all old entries for feature from db
+    echo "BEGIN;"
+
     echo "DELETE FROM $FEATURES_TABLE WHERE NAME = '$FEATURENAME';"
+    echo "DELETE FROM $SCORES_TABLE WHERE FNAME = '$FEATURENAME';"
 
-    echo "INSERT INTO $FEATURES_TABLE (NAME) VALUES ('$FEATURENAME');"
+    echo "INSERT INTO $FEATURES_TABLE (NAME,CATEGORY,DEFAULT_WEIGHT) VALUES ('$FEATURENAME','Others',1);"
 
-    local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,FNAME,SCORE) VALUES ("
+    local BEFORE="INSERT INTO $SCORES_TABLE (ULOGIN,DID,FNAME,SCORE) VALUES ("
     local AFTER=");"
-    awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, q fname q, q $2 q after }' $FILENAME
+    awk -v before="$BEFORE" -v after="$AFTER" -v fname="$FEATURENAME" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q, 1, q fname q, q $2 q after }' $FILENAME
+
+    echo "COMMIT;"
 }
 
 GenerateUserInserts () {
     local FILENAME=$1
 
-    local BEFORE="INSERT INTO $USERS_TABLE (UID, LOGIN) VALUES ("
+    echo "BEGIN;"
+
+    local BEFORE="INSERT INTO $USERS_TABLE (LOGIN) VALUES ("
     local AFTER=");"
-    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before $1, q $2 q after }' $FILENAME
+
+    awk -v before="$BEFORE" -v after="$AFTER" -v OFS="," -v q="'" -F "$SEPARATOR" '{ print before q $1 q after }' $FILENAME
+
+    echo "COMMIT;"
 }
 
 CheckDbExists () {
-    local EXISTS=$(psql -l | grep $DB | wc -l)
+    local EXISTS=$(psql -ls -U $DB_USER | grep $DB | wc -l)
     if [ "$EXISTS" -lt "1" ]; then
         echo "ERROR: Postgresql DB $DB does not exist"
         exit 1
@@ -38,24 +47,33 @@ CheckDbExists () {
 
 # Check if Postgres wrapper scripts are available
 if hash psql 2>/dev/null; then
-    while getopts "u:f:h" opt; do
+    USE_DB="true"
+    while getopts "u:f:hn" opt; do
         case $opt in
+            n)
+                USE_DB=""
+                ;;
             u) 
                 CheckDbExists
-                GenerateUserInserts $OPTARG | psql -q $DB
+                GenerateUserInserts $OPTARG |
+                    ([ $USE_DB ] &&  psql -U $DB_USER -q $DB || cat)
                 ;;
             f) 
                 CheckDbExists
                 BASE_FILE_EXT=$(basename "$OPTARG")
                 BASE_FILE="${BASE_FILE_EXT%.*}"
-                GenerateFeatureInserts $OPTARG $BASE_FILE | psql -q $DB
+                GenerateFeatureInserts $OPTARG $BASE_FILE |
+                    ([ $USE_DB ] && psql -U $DB_USER -q $DB || cat)
                 ;;
             h)
-                echo "Usage: $0 [-u file]* [-f file]*"
+                echo "Usage: $0 [-n] [-u file]* [-f file]*"
                 echo "In order to use this command, make sure you have a"
-                echo "Postgres database named $DB running."
+                echo "Postgres database named $DB running and a postgres user"
+                echo "named $DB_USER with sufficient rights."
+                echo "Options: -n     : Perform a dry run, print the SQL commands that would be executed."
+                echo "                  Note that any -f or -u before this option will not be performed dry."
                 echo "Options: -u file: Add all users in file to db."
-                echo "                  File format: userid,login"
+                echo "                  File format: login"
                 echo "         -f file: Add all scores in file to db."
                 echo "                  The filename without extension will be the name of the feature."
                 echo "                  File format: uname,score"
