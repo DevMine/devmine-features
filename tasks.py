@@ -3,6 +3,9 @@ from invoke import (
     run
 )
 
+import parsing
+from parsing.mysql.table_fields import table_fields
+
 # define projects directories
 dirs = 'parsing'
 
@@ -41,7 +44,28 @@ def clean_env():
 # Computation tasks
 @task
 def parse_mysql():
+    """Parse the mysql file to generate the tables"""
     run_cmd("python2.7 parsing/mysql/parse.py")
+
+
+@task(help={"table": "Input table",
+            "outputfile": "Output file, specify --stdout to write to stdout",
+            "fields": "Fields to extract from the table"})
+def get_fields(table, outputfile, fields):
+    """Extract fields from a given table"""
+    parsing.get_fields(table, outputfile, *fields.split())
+
+
+@task(help={"table": "Table to list the fields"})
+def list_fields(table):
+    """Lists the available fields in the given table"""
+    print("\n".join(table_fields[table]))
+
+
+@task
+def list_tables():
+    """Lists the available tables"""
+    print("\n".join(table_fields.keys()))
 
 
 @task
