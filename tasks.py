@@ -38,6 +38,12 @@ def clean_env():
     run_cmd('rm -r ./env && mkdir env && touch env/.keep')
 
 
+# Computation tasks
+@task
+def parse_mysql():
+    run_cmd("python2.7 parsing/mysql/parse.py")
+
+
 @task
 def compute_login_id(input='dataset/raw/users.bson', output='dataset/id.txt'):
     get_fields_bson("login id", input, output)
