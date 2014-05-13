@@ -40,10 +40,10 @@ Run `invoke parse_mysql` to generate the tables.
 
 ## Retrieving information from tables
 
-* To list the avialable tables:
+* To list the available tables:
   `invoke list_tables`
 
-* To list the avialable fields in a given table:
+* To list the available fields in a given table:
   `invoke list_fields <table_name>`, for example `invoke list_fields users`
 
 * To extract fields from a table:
