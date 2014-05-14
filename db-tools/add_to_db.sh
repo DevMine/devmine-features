@@ -2,7 +2,9 @@
 set -o nounset
 set -o errexit
 
-source ./definitions.sh
+SCRIPT_DIR=$(dirname $0)
+
+source $SCRIPT_DIR/definitions.sh
 
 SEPARATOR=","
 

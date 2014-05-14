@@ -214,6 +214,27 @@ def compute_all():
     pass
 
 
+# Database insert tasks
+@task
+def insert_users(filename):
+    add_to_db("-u " + filename)
+
+
+@task(help={"category": "Category of the features",
+            "filenames": "String of filenames separated by whitespace"})
+def insert_features(category, filenames):
+    """Insert multiple features into the database"""
+    for f in filenames.split():
+        insert_feature(category, f)
+
+
+@task(help={"category": "Category of the feature",
+            "filename": "Filename with scores"})
+def insert_feature(category, filename):
+    """Insert a feature into the database"""
+    add_to_db("-c " + category + " -f " + filename)
+
+
 def run_cmd(cmd):
     "Run a system command verbosely."
     print('Running \'' + cmd + '\'...')
@@ -224,3 +245,8 @@ def run_cmd(cmd):
 def get_fields_bson(fields, input, output, has_null=False):
     run_cmd('bsondump %s | python parsing/get_fields.py %s > %s 2> /dev/null' %
             (input, fields, output))
+
+
+def add_to_db(args):
+    cmd = "./db-tools/add_to_db.sh "
+    run_cmd(cmd + args)
