@@ -75,6 +75,7 @@ if hash psql 2>/dev/null; then
                 echo "In order to use this command, make sure you have a"
                 echo "Postgres database named $DB running and a postgres user"
                 echo "named $DB_USER with sufficient rights."
+                echo "It is possible to use another user or database name by exporting \$DB and/or \$DB_USER."
                 echo "Options: -n     : Perform a dry run, print the SQL commands that would be executed."
                 echo "                  Note that any -f or -u before this option will not be performed dry."
                 echo "         -c name: Use the 'name' as category for any following feature inserts."
