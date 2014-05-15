@@ -1,9 +1,6 @@
-import json
+from __future__ import print_function
+from bsonstream import KeyValueBSONInput
 import sys
-
-
-def fix_line(line):
-    return "{" + line[line.find("),")+2:]
 
 
 def read_field(record, f):
@@ -14,18 +11,26 @@ def read_field(record, f):
     return str(r)
 
 
-def read_file(source):
-    for line in source:
-        fixed_line = fix_line(line)
+def read_file(source, output, fields):
+    for _, record in KeyValueBSONInput(fh=source):
         try:
-            record = json.loads(fixed_line)
-            print(",".join([read_field(record, f) for f in sys.argv[1:]]))
+            print(",".join([read_field(record, f) for f in fields]),
+                  file=output)
         except KeyError:
             pass
         except Exception as e:
-            print("Problem reading line:", line.strip(), file=sys.stderr)
             print(e, file=sys.stderr)
 
 
 if __name__ == "__main__":
-    read_file(sys.stdin)
+    if sys.argv[1] == "--stdin":
+        infile = sys.stdin
+    else:
+        infile = open(sys.argv[1], "rb")
+
+    if sys.argv[2] == "--stdout":
+        outfile= sys.stdout
+    else:
+        outfile = open(sys.argv[2], "w")
+
+    read_file(infile, outfile, sys.argv[3:])
