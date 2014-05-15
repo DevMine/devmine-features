@@ -1,4 +1,3 @@
-from __future__ import print_function
 from bsonstream import KeyValueBSONInput
 import sys
 
@@ -14,12 +13,11 @@ def read_field(record, f):
 def read_file(source, output, fields):
     for _, record in KeyValueBSONInput(fh=source):
         try:
-            print(",".join([read_field(record, f) for f in fields]),
-                  file=output)
+            print >> output, ",".join([read_field(record, f) for f in fields])
         except KeyError:
             pass
         except Exception as e:
-            print(e, file=sys.stderr)
+            print >> sys.stderr, e
 
 
 if __name__ == "__main__":
