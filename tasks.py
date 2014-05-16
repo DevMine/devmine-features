@@ -3,6 +3,10 @@ from invoke import (
     run
 )
 
+from os import (
+    listdir
+)
+
 import parsing
 from parsing.mysql.table_fields import table_fields
 
@@ -221,11 +225,11 @@ def insert_users(filename):
 
 
 @task(help={"category": "Category of the features",
-            "filenames": "String of filenames separated by whitespace"})
-def insert_features(category, filenames):
+            "directory": "Directory where the features files are"})
+def insert_features(category, directory):
     """Insert multiple features into the database"""
-    for f in filenames.split():
-        insert_feature(category, f)
+    for f in os.listdir(directory):
+        insert_feature(category, directory + "/" + f)
 
 
 @task(help={"category": "Category of the feature",
