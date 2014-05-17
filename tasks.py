@@ -179,12 +179,56 @@ def compute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
 @task
 def compute_projects_language(input='dataset/raw/repos.bson',
                               output='dataset/projects_language'):
-    # TODO:
-    # we need to join the repo_collaborators and repos
-    # in repo_collaborators, we don't have repo id
-    # but we can use owner_id/repo_name as the id
-    pass
-
+    # NOTE: we join repos_collaborators and repos
+    # then loop through the user to find triple (user,repo,language)
+    # and write to the output
+    # for some reason I cound not test this function using
+    # invoc compute_projects_language <my_input> <my_output>
+    
+    collabs = "dataset/raw/repo_collaborators.small.bson"
+    users = "dataset/raw/users.small.bson"
+    get_fields_bson("login owner repo",collabs, "collaborators.txt")
+    f = open("collaborators.txt","r")
+    collab_dict = dict()
+    for line in f:
+        ss = line.strip().split(",")
+        val = "%s/%s" % (ss[1], ss[2])
+        key = ss[0]
+        if key in collab_dict.keys():
+            collab_dict[key].append(val)
+        else:
+            collab_dict[key] = [val]
+    f.close()
+    get_fields_bson("name owner/login language",input,"repos.txt")
+    f = open("repos.txt","r")
+    repo_dict = dict()
+    for line in f:
+        ss = line.strip().split(",")
+        key = "%s/%s" % (ss[1], ss[0])
+        val = ss[2]
+        if key in repo_dict.keys():
+            repo_dict[key].append(val)
+        else:
+            repo_dict[key] = [val]
+    f.close()
+    get_fields_bson("login",users, "users.txt")
+    f = open("users.txt","r")
+    fout = open(output,"w")
+    user_dict = dict()
+    for line in f:
+        ss = line.strip().split(",")
+        user = ss[0]
+        if user in collab_dict.keys():
+            for repo in collab_dict[user]:
+                for lang in repo_dict[repo]:
+                    s = "%s,%s,%s\n" % (user,repo,lang)
+                    fout.write(s)
+        else:
+            s = "%s,,\n" % (user)
+            fout.write(s)
+        fout.flush()
+    f.close()
+    fout.close()
 
 @task
 def precompute_issues_solved(input='dataset/raw/issues.bson',
