@@ -159,7 +159,7 @@ def precompute_issues_detected(input='dataset/raw/issues.bson',
 def compute_issues_detected(input='dataset/raw/issues.bson',
                             output='dataset/issues_detected'):
     precompute_issues_detected(input, output + '.txt')
-    run_cmd('python parsing/issues_detected.py %s.txt %s' % (output, output))
+    run_cmd('python parsing/bson/issues_detected.py %s.txt %s' % (output, output))
 
 
 @task
@@ -173,7 +173,7 @@ def precompute_projects_contributed(
 def compute_projects_contributed(input='dataset/raw/repo_collaborators.bson',
                                  output='dataset/projects_contributed'):
     precompute_projects_contributed(input, output + '.txt')
-    run_cmd('python parsing/collaborators.py %s.txt %s' % (output, output))
+    run_cmd('python parsing/bson/collaborators.py %s.txt %s' % (output, output))
 
 
 @task
@@ -184,7 +184,7 @@ def compute_projects_language(input='dataset/raw/repos.bson',
     # and write to the output
     # for some reason I cound not test this function using
     # invoc compute_projects_language <my_input> <my_output>
-    
+
     collabs = "dataset/raw/repo_collaborators.small.bson"
     users = "dataset/raw/users.small.bson"
     get_fields_bson("login owner repo",collabs, "collaborators.txt")
@@ -240,7 +240,7 @@ def precompute_issues_solved(input='dataset/raw/issues.bson',
 def compute_issues_solved(input='dataset/raw/issues.bson',
                           output='dataset/issues_solved'):
     precompute_issues_solved(input, output + '.txt')
-    run_cmd('python parsing/issues_solved.py %s.txt %s' % (output, output))
+    run_cmd('python parsing/bson/issues_solved.py %s.txt %s' % (output, output))
 
 
 @task
