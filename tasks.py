@@ -272,7 +272,7 @@ def insert_users(filename):
             "directory": "Directory where the features files are"})
 def insert_features(category, directory):
     """Insert multiple features into the database"""
-    for f in os.listdir(directory):
+    for f in listdir(directory):
         insert_feature(category, directory + "/" + f)
 
 
