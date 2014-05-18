@@ -7,8 +7,8 @@ from os import (
     listdir
 )
 
-import parsing
-from parsing.mysql.table_fields import table_fields
+#import parsing
+#from parsing.mysql.table_fields import table_fields
 
 # define projects directories
 dirs = 'parsing'
@@ -76,54 +76,29 @@ def list_tables():
 def compute_login_id(input='dataset/raw/users.bson', output='dataset/id.txt'):
     get_fields_bson("login id", input, output)
 
+@task
+def precompute_location(input='dataset/raw/users.bson',
+                               output='dataset/location.txt'):
+    get_fields_bson("login location", input, output)
+
 
 @task
 def compute_location(input='dataset/raw/users.bson',
-                     output='dataset/location.txt'):
-    get_fields_bson("login location", input, output)
-    pairs = []
-    f = open(output, "r")
-    for line in f:
-        ss = line.strip().split(",")
-        if len(ss) == 1:
-            user, comp = ss[0], ""
-        elif ss[1].startswith("None"):
-            user, comp = ss[0], ""
-        else:
-            user, comp = ss[0], ss[1]
-        pairs.append((user, comp))
-    f.close()
-    f = open(output, "w")
-    for pair in pairs:
-        s = "%s,%s\n" % (pair[0], pair[1])
-        f.write(s)
-        f.flush()
-    f.close()
+                            output='dataset/location'):
+    precompute_location(input, output + '.txt')
+    run_cmd('python parsing/bson/location.py %s.txt %s' % (output, output))
+
+@task
+def precompute_company(input='dataset/raw/users.bson',
+                               output='dataset/company.txt'):
+    get_fields_bson("login company", input, output)
 
 
 @task
 def compute_company(input='dataset/raw/users.bson',
-                    output='dataset/company.txt'):
-    get_fields_bson("login company", input, output)
-    pairs = []
-    f = open(output, "r")
-    for line in f:
-        ss = line.strip().split(",")
-        if len(ss) == 1:
-            user, comp = ss[0], ""
-        elif ss[1].startswith("None"):
-            user, comp = ss[0], ""
-        else:
-            user, comp = ss[0], ss[1]
-        pairs.append((user, comp))
-    f.close()
-    f = open(output, "w")
-    for pair in pairs:
-        s = "%s,%s\n" % (pair[0], pair[1])
-        f.write(s)
-        f.flush()
-    f.close()
-
+                            output='dataset/company'):
+    precompute_company(input, output + '.txt')
+    run_cmd('python parsing/bson/company.py %s.txt %s' % (output, output))
 
 @task
 def compute_followers(input='dataset/raw/users.bson',
