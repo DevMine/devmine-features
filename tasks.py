@@ -157,53 +157,16 @@ def compute_projects_language(input='dataset/raw/repos.bson',
     # NOTE: we join repos_collaborators and repos
     # then loop through the user to find triple (user,repo,language)
     # and write to the output
-    # for some reason I cound not test this function using
-    # invoc compute_projects_language <my_input> <my_output>
 
-    collabs = "dataset/raw/repo_collaborators.small.bson"
-    users = "dataset/raw/users.small.bson"
-    get_fields_bson("login owner repo",collabs, "collaborators.txt")
-    f = open("collaborators.txt","r")
-    collab_dict = dict()
-    for line in f:
-        ss = line.strip().split(",")
-        val = "%s/%s" % (ss[1], ss[2])
-        key = ss[0]
-        if key in collab_dict.keys():
-            collab_dict[key].append(val)
-        else:
-            collab_dict[key] = [val]
-    f.close()
-    get_fields_bson("name owner/login language",input,"repos.txt")
-    f = open("repos.txt","r")
-    repo_dict = dict()
-    for line in f:
-        ss = line.strip().split(",")
-        key = "%s/%s" % (ss[1], ss[0])
-        val = ss[2]
-        if key in repo_dict.keys():
-            repo_dict[key].append(val)
-        else:
-            repo_dict[key] = [val]
-    f.close()
-    get_fields_bson("login",users, "users.txt")
-    f = open("users.txt","r")
-    fout = open(output,"w")
-    user_dict = dict()
-    for line in f:
-        ss = line.strip().split(",")
-        user = ss[0]
-        if user in collab_dict.keys():
-            for repo in collab_dict[user]:
-                for lang in repo_dict[repo]:
-                    s = "%s,%s,%s\n" % (user,repo,lang)
-                    fout.write(s)
-        else:
-            s = "%s,,\n" % (user)
-            fout.write(s)
-        fout.flush()
-    f.close()
-    fout.close()
+    collabs_in = "dataset/raw/repo_collaborators.bson"
+    collabs_out = "dataset/collab.tmp.txt"
+    users_in = "dataset/raw/users.bson"
+    users_out = "dataset/users.tmp.txt"
+    repos_out = "dataset/repos.tmp.txt"
+    get_fields_bson("login owner repo",collabs_in,collabs_out)
+    get_fields_bson("login",users_in,users_out)
+    get_fields_bson("name owner/login language",input,repos_out)
+    run_cmd('python parsing/bson/projects_language.py %s %s %s %s' % (collabs_out,users_out,repos_out,output))
 
 @task
 def precompute_issues_solved(input='dataset/raw/issues.bson',
