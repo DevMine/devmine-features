@@ -291,7 +291,7 @@ def run_cmd(cmd):
 
 
 def get_fields_bson(fields, input, output, has_null=False):
-    run_cmd('bsondump %s | python parsing/get_fields.py %s > %s 2> /dev/null' %
+    run_cmd('bsondump %s | python parsing/bson/get_fields_json.py %s > %s 2> /dev/null' %
             (input, fields, output))
 
 
